@@ -1,4 +1,5 @@
-import { sql } from '@vercel/postgres';
+import { neon } from '@neondatabase/serverless';
+const sql = neon(process.env.POSTGRES_URL_NON_POOLING || process.env.POSTGRES_URL);
 
 export default async function handler(req, res) {
   // Only allow GET requests
@@ -24,7 +25,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       success: true,
-      submissions: result.rows || []
+      submissions: result || []
     });
   } catch (error) {
     console.error('Error fetching submissions:', error);

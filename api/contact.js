@@ -1,4 +1,5 @@
-import { sql } from '@vercel/postgres';
+import { neon } from '@neondatabase/serverless';
+const sql = neon(process.env.POSTGRES_URL_NON_POOLING || process.env.POSTGRES_URL);
 import nodemailer from 'nodemailer';
 
 export default async function handler(req, res) {
@@ -29,7 +30,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ 
       success: true, 
       message: 'Message sent successfully!',
-      id: result.rows[0].id 
+      id: result[0].id 
     });
   } catch (error) {
     console.error('Error saving contact form submission:', error);
