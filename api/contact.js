@@ -16,8 +16,20 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'All fields are required.' });
     }
 
+    // Ensure table exists (handles Neon's separate production/preview branches)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS ContactSubmissions (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        phone VARCHAR(50),
+        message TEXT,
+        status VARCHAR(20) DEFAULT 'new',
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
     // Insert into database
-    // Make sure you have created the ContactSubmissions table in your Vercel Postgres dashboard
     const result = await pool.query(`
       INSERT INTO ContactSubmissions (name, email, phone, message, status, created_at)
       VALUES ($1, $2, $3, $4, 'new', NOW())

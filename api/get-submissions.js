@@ -16,6 +16,19 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
+    // Ensure table exists (handles Neon's separate production/preview branches)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS ContactSubmissions (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        phone VARCHAR(50),
+        message TEXT,
+        status VARCHAR(20) DEFAULT 'new',
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
     // Fetch all submissions from database
     const result = await pool.query(`
       SELECT id, name, email, phone, message, status, created_at
