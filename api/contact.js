@@ -1,5 +1,5 @@
-import { neon } from '@neondatabase/serverless';
-const sql = neon(process.env.POSTGRES_URL_NON_POOLING || process.env.POSTGRES_URL);
+import { Pool } from '@neondatabase/serverless';
+const pool = new Pool({ connectionString: process.env.POSTGRES_URL_NON_POOLING || process.env.POSTGRES_URL });
 import nodemailer from 'nodemailer';
 
 export default async function handler(req, res) {
@@ -18,11 +18,11 @@ export default async function handler(req, res) {
 
     // Insert into database
     // Make sure you have created the ContactSubmissions table in your Vercel Postgres dashboard
-    const result = await sql`
+    const result = await pool.query(`
       INSERT INTO ContactSubmissions (name, email, phone, message, status, created_at)
-      VALUES (${name}, ${email}, ${phone}, ${message}, 'new', NOW())
+      VALUES ($1, $2, $3, $4, 'new', NOW())
       RETURNING id;
-    `;
+    `, [name, email, phone, message]);
 
     // Send email notification to admin
     await sendEmailNotification(name, email, phone, message);
@@ -30,7 +30,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ 
       success: true, 
       message: 'Message sent successfully!',
-      id: result[0].id 
+      id: result.rows[0].id 
     });
   } catch (error) {
     console.error('Error saving contact form submission:', error);

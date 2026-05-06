@@ -1,5 +1,5 @@
-import { neon } from '@neondatabase/serverless';
-const sql = neon(process.env.POSTGRES_URL_NON_POOLING || process.env.POSTGRES_URL);
+import { Pool } from '@neondatabase/serverless';
+const pool = new Pool({ connectionString: process.env.POSTGRES_URL_NON_POOLING || process.env.POSTGRES_URL });
 
 export default async function handler(req, res) {
   // Only allow PATCH requests
@@ -23,11 +23,11 @@ export default async function handler(req, res) {
     }
 
     // Update submission status
-    await sql`
+    await pool.query(`
       UPDATE ContactSubmissions
-      SET status = ${status}
-      WHERE id = ${id};
-    `;
+      SET status = $1
+      WHERE id = $2;
+    `, [status, id]);
 
     return res.status(200).json({
       success: true,

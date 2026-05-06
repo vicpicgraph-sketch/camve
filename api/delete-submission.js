@@ -1,5 +1,5 @@
-import { neon } from '@neondatabase/serverless';
-const sql = neon(process.env.POSTGRES_URL_NON_POOLING || process.env.POSTGRES_URL);
+import { Pool } from '@neondatabase/serverless';
+const pool = new Pool({ connectionString: process.env.POSTGRES_URL_NON_POOLING || process.env.POSTGRES_URL });
 
 export default async function handler(req, res) {
   // Only allow DELETE requests
@@ -23,10 +23,10 @@ export default async function handler(req, res) {
     }
 
     // Delete submission from database
-    await sql`
+    await pool.query(`
       DELETE FROM ContactSubmissions
-      WHERE id = ${id};
-    `;
+      WHERE id = $1;
+    `, [id]);
 
     return res.status(200).json({
       success: true,
