@@ -249,6 +249,10 @@ header.scrolled {
     border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
+header.scrolled .logo {
+    height: 40px;
+}
+
 .nav-container {
     display: flex;
     justify-content: space-between;
@@ -256,15 +260,17 @@ header.scrolled {
 }
 
 .logo {
-    font-family: var(--font-heading);
-    font-size: 1.75rem;
-    font-weight: 800;
-    letter-spacing: 1px;
-    color: white;
+    display: flex;
+    align-items: center;
+    height: 50px; /* Increased for better visibility */
+    transition: height var(--transition-normal);
 }
 
-.logo .dot {
-    color: var(--primary-color);
+.logo-img {
+    height: 100%;
+    width: auto;
+    display: block;
+    object-fit: contain;
 }
 
 .nav-links {
